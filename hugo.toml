@@ -7,8 +7,8 @@ theme= 'hugo-coder'
 pagerSize = 20
 
 [services]
-[services.disqus]
-shortname = "roboticdinosaur"
+#[services.disqus]
+#shortname = "roboticdinosaur"
 
 [markup.highlight]
 style = "github-dark"
