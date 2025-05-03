@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <title>
+  How I Layered a Proxy and VPN for Ghost Mode in Kali · RoboticDinosaur
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="RoboticDinosaur">
+<meta name="description" content="
+  Introduction
+  
+    
+    Link to heading
+  
+
+In the realm of cybersecurity, maintaining anonymity and security while conducting research or penetration testing is crucial. This article explores how I established a multi-layered internet access system using Kali Linux, a proxy, and a VPN to achieve &ldquo;ghost mode&rdquo;. This configuration allows me to operate invisibly online, avoiding potential risks and unwanted attention.
+
+  Why I Did This
+  
+    
+    Link to heading
+  
+
+The core environment is a Kali Linux VM running in isolation, ensuring that any misbehaving tools or accidental leaks don’t affect the host system. To cloak the traffic, I use a Shadowsocks proxy — a lightweight, fast proxy that helps bypass deep packet inspection built in to PIA. This connects to a VPS in Country A. On top of that, PIA&rsquo;s VPN (configured with OpenVPN) adds an encrypted layer and exits traffic in a completely different location (Country B), creating geographic and protocol-based separation.">
+<meta name="keywords" content="[Pentesting Security Hacking]">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How I Layered a Proxy and VPN for Ghost Mode in Kali">
+  <meta name="twitter:description" content="Introduction Link to heading In the realm of cybersecurity, maintaining anonymity and security while conducting research or penetration testing is crucial. This article explores how I established a multi-layered internet access system using Kali Linux, a proxy, and a VPN to achieve “ghost mode”. This configuration allows me to operate invisibly online, avoiding potential risks and unwanted attention.
+Why I Did This Link to heading The core environment is a Kali Linux VM running in isolation, ensuring that any misbehaving tools or accidental leaks don’t affect the host system. To cloak the traffic, I use a Shadowsocks proxy — a lightweight, fast proxy that helps bypass deep packet inspection built in to PIA. This connects to a VPS in Country A. On top of that, PIA’s VPN (configured with OpenVPN) adds an encrypted layer and exits traffic in a completely different location (Country B), creating geographic and protocol-based separation.">
+
+<meta property="og:url" content="http://localhost:1313/posts/2025-04-23-multilayer-vpn-proxy-stack/">
+  <meta property="og:site_name" content="RoboticDinosaur">
+  <meta property="og:title" content="How I Layered a Proxy and VPN for Ghost Mode in Kali">
+  <meta property="og:description" content="Introduction Link to heading In the realm of cybersecurity, maintaining anonymity and security while conducting research or penetration testing is crucial. This article explores how I established a multi-layered internet access system using Kali Linux, a proxy, and a VPN to achieve “ghost mode”. This configuration allows me to operate invisibly online, avoiding potential risks and unwanted attention.
+Why I Did This Link to heading The core environment is a Kali Linux VM running in isolation, ensuring that any misbehaving tools or accidental leaks don’t affect the host system. To cloak the traffic, I use a Shadowsocks proxy — a lightweight, fast proxy that helps bypass deep packet inspection built in to PIA. This connects to a VPS in Country A. On top of that, PIA’s VPN (configured with OpenVPN) adds an encrypted layer and exits traffic in a completely different location (Country B), creating geographic and protocol-based separation.">
+  <meta property="og:locale" content="en_gb">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-23T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-04-23T00:00:00+00:00">
+
+
+
+
+<link rel="canonical" href="http://localhost:1313/posts/2025-04-23-multilayer-vpn-proxy-stack/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.css" media="screen">
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.css" media="screen">
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="http://localhost:1313/">
+      RoboticDinosaur
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Posts</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/contact/">Contact</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="http://localhost:1313/posts/2025-04-23-multilayer-vpn-proxy-stack/">
+              How I Layered a Proxy and VPN for Ghost Mode in Kali
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2025-04-23T00:00:00Z">
+                April 23, 2025
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              5-minute read
+            </span>
+          </div>
+          
+          
+          
+        </div>
+      </header>
+
+      <div class="post-content">
+        
+        <h2 id="introduction">
+  Introduction
+  <a class="heading-link" href="#introduction">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>In the realm of cybersecurity, maintaining anonymity and security while conducting research or penetration testing is crucial. This article explores how I established a multi-layered internet access system using <strong>Kali Linux</strong>, a proxy, and a VPN to achieve &ldquo;ghost mode&rdquo;. This configuration allows me to operate invisibly online, avoiding potential risks and unwanted attention.</p>
+<h2 id="why-i-did-this">
+  Why I Did This
+  <a class="heading-link" href="#why-i-did-this">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>The core environment is a Kali Linux VM running in isolation, ensuring that any misbehaving tools or accidental leaks don’t affect the host system. To cloak the traffic, I use a Shadowsocks proxy — a lightweight, fast proxy that helps bypass deep packet inspection built in to PIA. This connects to a VPS in Country A. On top of that, PIA&rsquo;s VPN (configured with OpenVPN) adds an encrypted layer and exits traffic in a completely different location (Country B), creating geographic and protocol-based separation.</p>
+<ul>
+<li><strong>Secure Access</strong>: To use <strong>Kali Linux</strong> in various environments while maintaining anonymity.</li>
+<li><strong>Avoid Exposures</strong>: To prevent <strong>DNS leaks</strong>, <strong>IP exposure</strong>, and <strong>traffic fingerprinting</strong>.</li>
+<li><strong>Multi-Country Routing</strong>: To route my internet traffic through multiple countries for added obfuscation.</li>
+<li><strong>Tool Usage</strong>: To use tools like <strong>Wireshark</strong>, <strong>Metasploit</strong>, or <strong>Burp Suite</strong> without giving away my intentions.</li>
+</ul>
+<h2 id="the-tools-i-use">
+  The Tools I Use
+  <a class="heading-link" href="#the-tools-i-use">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Here’s the technical setup I implemented:</p>
+<ol>
+<li><strong>Kali Linux Virtual Machine (VM)</strong>: My go-to environment for penetration testing.</li>
+<li><strong>Shadowsocks Proxy</strong>: Connected to a remote VPS in Country A.</li>
+<li><strong>PIA VPN (Private Internet Access)</strong>: Utilizes OpenVPN and WireGuard for secure, multi-hop routing (Country B).</li>
+</ol>
+<h2 id="how-it-works">
+  How It Works
+  <a class="heading-link" href="#how-it-works">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Everything runs through PIA&rsquo;s built-in multihop stack:
+When Kali connects to the internet, all traffic first routes through the Shadowsocks proxy, which forwards it to my VPS. This adds obfuscation, making it harder for any monitoring system to identify the actual nature of my traffic. From there, the traffic continues through the PIA VPN tunnel — which handles encryption and final exit to the public internet. Because PIA supports multi-hop, even if my VPS were compromised, it wouldn’t lead directly to me.</p>
+<ul>
+<li><strong>Shadowsocks</strong>: Obfuscates traffic to make it harder to identify or block.</li>
+<li><strong>OpenVPN</strong>: Carries this traffic to its final destination.</li>
+</ul>
+<p>PIA’s multi-hop routing simplifies the configuration, eliminating the need for custom VPS setups or complex proxy configurations.</p>
+<h2 id="vpn-configuration-with-pia">
+  VPN Configuration with PIA
+  <a class="heading-link" href="#vpn-configuration-with-pia">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>I use OpenVPN primarily for compatibility with Shadowsocks. WireGuard, while faster, doesn’t always play nicely in layered setups without additional configuration. The kill switch ensures no traffic escapes unencrypted, and MACE provides lightweight ad and tracker blocking at the DNS level — which has proven helpful when testing tools that pull third-party resources.</p>
+<ul>
+<li><strong>Protocol</strong>: OpenVPN (compatible with Shadowsocks).</li>
+<li><strong>Kill Switch</strong>: Enabled to ensure no data is transmitted without a stable connection.</li>
+<li><strong>MACE</strong>: Turned on to block malicious domains and ads.</li>
+<li><strong>Auto-connect</strong>: Enabled for seamless setup when the device boots.</li>
+<li><strong>Split Tunneling</strong>: Disabled – all traffic goes through PIA.</li>
+</ul>
+<h3 id="cli-configuration-options">
+  CLI Configuration Options
+  <a class="heading-link" href="#cli-configuration-options">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>piactl set protocol wireguard  <span style="color:#8b949e;font-style:italic"># Configure WireGuard as the preferred protocol</span>
+</span></span><span style="display:flex;"><span>piactl set killswitch auto     <span style="color:#8b949e;font-style:italic"># Enable kill switch on boot</span>
+</span></span><span style="display:flex;"><span>piactl set mace true         <span style="color:#8b949e;font-style:italic"># Activate MACE for enhanced protection</span>
+</span></span><span style="display:flex;"><span>piactl connect               <span style="color:#8b949e;font-style:italic"># Establish a connection</span>
+</span></span></code></pre></div><h2 id="verification">
+  Verification
+  <a class="heading-link" href="#verification">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>To confirm the setup is configured correctly I have the following in a bash script I run periodically and always on start:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>piactl get connectionstate  <span style="color:#8b949e;font-style:italic"># Check if you&#39;re connected</span>
+</span></span><span style="display:flex;"><span>piactl get vpnip           <span style="color:#8b949e;font-style:italic"># Get your current VPN IP address</span>
+</span></span><span style="display:flex;"><span>piactl get region          <span style="color:#8b949e;font-style:italic"># Confirm which country you&#39;re connected through</span>
+</span></span></code></pre></div><p>and I also check for the actual connection and potential leaks with the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl https://ifconfig.me  <span style="color:#8b949e;font-style:italic"># Check your public IP address</span>
+</span></span><span style="display:flex;"><span>curl https://ipinfo.io    <span style="color:#8b949e;font-style:italic"># Verify your internet location</span>
+</span></span><span style="display:flex;"><span>dig +short myip.opendns.com @resolver1.opendns.com  <span style="color:#8b949e;font-style:italic"># Check DNS configuration</span>
+</span></span></code></pre></div><p>I&rsquo;ll also monitor my communication with wireshark with the following setup.</p>
+<ul>
+<li><strong>TCP Stream Timeout</strong>: 1 minute to ensure only active connections are captured.</li>
+<li><strong>MTU (Maximum Transmission Unit)</strong>: Auto-MTU enabled to prevent fragmentation.</li>
+<li><strong>Kernel Module</strong>: Enabled for better interface access and performance.</li>
+</ul>
+<p>If the VPN drops, PIA’s kill switch automatically blocks all outbound traffic—no DNS leaks or fallback IP exposure.</p>
+<h2 id="what-i-learned">
+  What I Learned
+  <a class="heading-link" href="#what-i-learned">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>This setup has taught me several valuable lessons:</p>
+<ul>
+<li><strong>Layering Security</strong>: Combining Shadowsocks with a robust VPN creates an undetectable connection.</li>
+<li><strong>MACE is a Game-Changer</strong>: It blocked malicious callbacks from tools I was testing.</li>
+<li><strong>Auto-MTU Matters</strong>: Without it, tools like Burp Suite and curl would break due to fragmented packets.</li>
+<li><strong>Single Provider = Low Maintenance</strong>: Relying on PIA’s built-in features simplifies routing and reduces maintenance.</li>
+</ul>
+<h2 id="key-takeaways">
+  Key Takeaways
+  <a class="heading-link" href="#key-takeaways">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li>Use a VPN with built-in multi-hop routing for added security.</li>
+<li>Enable kill switch and MACE features to prevent leaks and block malicious traffic.</li>
+<li>Always verify your setup with sanity checks to ensure everything is working as intended.</li>
+<li>Keep it simple with a single provider for easier maintenance.</li>
+</ul>
+<h2 id="conclusion">
+  Conclusion
+  <a class="heading-link" href="#conclusion">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>This ghost mode setup is clean, portable, and works across any Kali box or travel laptop. It’s designed to stay out of sight while maintaining full functionality. By combining a proxy with a VPN, I’ve created a secure, multi-hop connection that keeps my activities undetectable and my identity hidden.</p>
+<p>The journey into setting up this multi-layered security system has been both challenging and rewarding. It’s not perfect, but it works—and when you need stealthy internet access, sometimes simple is the best solution. I’m excited to see how others enhance this method or share their own setups in the comments below.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        <div id="disqus_thread"></div>
+<script>
+  window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "roboticdinosaur" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+    
+    document.addEventListener('themeChanged', function (e) { 
+        if (document.readyState == 'complete') {
+          DISQUS.reset({ reload: true, config: disqus_config });
+        }
+    });
+</script>
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    
+<footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2025 RoboticDinosaur</span>
+            <span>
+                <a href="https://mastodon.social/@roboticdinosaur" target="_blank" rel="noopener" title="mastodon">
+                    <i class="fa-brands fa-mastodon"></i>
+                </a>
+                <a href="https://github.com/roboticdinosaur" target="_blank" rel="noopener" title="github">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+            </span>
+        </div>
+    </div>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.js"></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

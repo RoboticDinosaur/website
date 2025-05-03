@@ -1,0 +1,18 @@
+{{ $currentPage := . }}
+<footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; {{ now.Format "2006" }} {{ .Site.Params.author }}</span>
+
+            {{- with .Site.Params.social }}
+            <span>
+                {{- range sort . "weight" }}
+                <a href="{{ .url }}" target="_blank" rel="noopener" title="{{ .name }}">
+                    <i class="{{ .icon }}"></i>
+                </a>
+                {{- end }}
+            </span>
+            {{- end }}
+        </div>
+    </div>
+</footer>
