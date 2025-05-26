@@ -65,3 +65,6 @@ style = "github-dark"
 #  weight = 3
 #  url = "/contact/"
 
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
