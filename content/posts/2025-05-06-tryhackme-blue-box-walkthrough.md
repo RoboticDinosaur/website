@@ -1,6 +1,6 @@
 ---
 title: "[Challenge Name] – [CTF Name] Writeup"
-date: YYYY-MM-DD
+date: 2025-05-01
 series: "CTF Writeups"
 categories: ["Pentesting", "CTF", "[Specific Category like Web, Crypto, Pwn, etc.]"]
 tags: ["CTF", "Pentest", "[Tool Used]", "[Vulnerability Type]", "[Platform if relevant]"]
