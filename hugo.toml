@@ -15,7 +15,7 @@ style = "github-dark"
 
 [params]
   author = "RoboticDinosaur"
-  info = "Soon to be Pentesting Superstar"
+  info = "A journey through cyber security"
   description = "A personal journey through the world of pentesting and security"
   keywords = ["Pentesting", "Security", "Hacking"]
   avatarurl = "images/roboticdinosaur.svg"
@@ -39,11 +39,11 @@ style = "github-dark"
 #  weight = 1
 #  url = "https://indieweb.social/@roboticdinosaur"
 
-#[[params.social]]
-#  name = "github"
-#  icon = "fa-brands fa-github"
-#  weight = 2
-#  url = "https://github.com/roboticdinosaur"
+[[params.social]]
+  name = "github"
+  icon = "fa-brands fa-github"
+  weight = 2
+  url = "https://github.com/roboticdinosaur"
 
 #[[menu.main]]
 #  name = "About"
